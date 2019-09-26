@@ -2,6 +2,10 @@ package com.example.demologin;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -11,37 +15,52 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class MainActivity extends AppCompatActivity {
     boolean logoIsShowing = false;
 
-    public void fade (View view) {
-        ImageView image = (ImageView)findViewById(R.id.androidImageView);
-        ImageView logo = (ImageView)findViewById(R.id.logoImageView);
-        if (!logoIsShowing) {
-            image.animate().rotation(360).alpha(0).setDuration(1000);
-            logo.animate().alpha(1).setDuration(2000);
-        } else {
-            image.animate().alpha(1).setDuration(2000);
-            logo.animate().rotation(360).alpha(0).setDuration(1000);
-        }
-        logoIsShowing = !logoIsShowing;
+    ImageView imageView;
 
-        // Creat countdown timer here
-        CountDownTimer countDownTimer = new CountDownTimer(10000, 1000) {
-            public void onTick(long tick) {
-                Log.i("Info", String.valueOf(tick));
-            }
-            public void onFinish() {
-                Toast.makeText(getApplicationContext(), "Finished!", Toast.LENGTH_SHORT);
-                // Log.i("Info", "Finished!");
-            }
-        }.start();
+    public void downloadImage(View view) {
+        Log.i("Info", "Button pressed!");
+        ImageDowloader task = new ImageDowloader();
+        Bitmap myImage;
+        try {
+            myImage = task.execute("https://www.pinclipart.com/picdir/middle/89-891532_android-logo-png-android-logo-hd-png-clipart.png").get();
+            imageView.setImageBitmap(myImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+        imageView = (ImageView)findViewById(R.id.imageView);
+    }
+
+    public class ImageDowloader extends AsyncTask<String, Void, Bitmap> {
+
+        @Override
+        protected Bitmap doInBackground(String... urls) {
+            try {
+                URL url = new URL(urls[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+
+                InputStream in = connection.getInputStream();
+                Bitmap dowloadedBitmap = BitmapFactory.decodeStream(in);
+                return dowloadedBitmap;
+            } catch(Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
     }
 }
