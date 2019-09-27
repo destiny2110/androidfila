@@ -20,47 +20,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
-    boolean logoIsShowing = false;
-
-    ImageView imageView;
-
-    public void downloadImage(View view) {
-        Log.i("Info", "Button pressed!");
-        ImageDowloader task = new ImageDowloader();
-        Bitmap myImage;
-        try {
-            myImage = task.execute("https://www.pinclipart.com/picdir/middle/89-891532_android-logo-png-android-logo-hd-png-clipart.png").get();
-            imageView.setImageBitmap(myImage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageView = (ImageView)findViewById(R.id.imageView);
-    }
-
-    public class ImageDowloader extends AsyncTask<String, Void, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(String... urls) {
-            try {
-                URL url = new URL(urls[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
-
-                InputStream in = connection.getInputStream();
-                Bitmap dowloadedBitmap = BitmapFactory.decodeStream(in);
-                return dowloadedBitmap;
-            } catch(Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
     }
 }
